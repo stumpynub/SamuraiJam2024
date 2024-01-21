@@ -39,6 +39,7 @@ public class Player : MonoBehaviour
     private Vector3 _prevGroundVelocity = Vector3.zero;
     private Vector3 _prevAirVelocity = Vector3.zero;
 
+    private Vector3 _cameraRot = new(); 
     // Input 
     private InputAction _fire; 
 
@@ -115,10 +116,10 @@ public class Player : MonoBehaviour
 
         if (Velocity.magnitude > 5)
         {
-            _camera.fieldOfView = Mathf.Lerp(_camera.fieldOfView, 90, Time.deltaTime * Velocity.magnitude); 
+            _camera.fieldOfView = Mathf.Lerp(_camera.fieldOfView, 85, Time.deltaTime * Velocity.magnitude / 2); 
         } else
         {
-            _camera.fieldOfView = Mathf.Lerp(_camera.fieldOfView, _camInitFov, Time.deltaTime * 10); 
+            _camera.fieldOfView = Mathf.Lerp(_camera.fieldOfView, _camInitFov, Time.deltaTime * 2); 
         }
 
         HandleCameraRotation();
@@ -226,12 +227,21 @@ public class Player : MonoBehaviour
 
     void HandleCameraRotation()
     {
-        _camera.transform.localEulerAngles += new Vector3(-GetLookAxis().y, GetLookAxis().x, 0);
-
         var camRollDot = Vector3.Dot(_camera.transform.right, Velocity) * Mathf.Abs(GetMoveAxis().x);
         var localEulers = _camera.transform.localEulerAngles;
+
+        _cameraRot += new Vector3(-GetLookAxis().y, GetLookAxis().x, 0);
+        
+        _cameraRot = new Vector3(
+            Mathf.Clamp(_cameraRot.x, -89, 89), 
+            _cameraRot.y, 
+            _cameraRot.z
+        ); 
+
         _cameraRoll = Mathf.Lerp(_cameraRoll, camRollDot, Velocity.magnitude * Time.deltaTime);
-        _camera.transform.localEulerAngles = new Vector3(localEulers.x, localEulers.y, -_cameraRoll * CameraRollAmount);
+        _cameraRoll = Mathf.Lerp(_cameraRoll, 0, Time.deltaTime * 10);
+
+        _camera.transform.rotation = Quaternion.Euler( new Vector3(_cameraRot.x, _cameraRot.y, -_cameraRoll)); 
     }
 
     public CharacterState GetCharacterState()
