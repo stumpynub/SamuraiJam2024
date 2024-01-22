@@ -17,7 +17,7 @@ public class GridSpawnRand : MonoBehaviour
             {
                 Vector3 spawnPosition = new Vector3(startPosition.x + (size.x / rows) * i, startPosition.y, startPosition.z + (size.z / columns) * j);
 
-                float coinFlip = Random.Range(0, 1);
+                float coinFlip = Random.Range(0, 2);
 
                 Quaternion rotation = Quaternion.identity;
                 if (coinFlip == 1)
